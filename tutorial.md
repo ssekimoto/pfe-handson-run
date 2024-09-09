@@ -1,12 +1,12 @@
 <walkthrough-metadata>
   <meta name="title" content="PFE Jissen" />
-  <meta name="description" content="Hands-on Platform Engineering Jissen" />
+  <meta name="description" content="Hands-on Platform Engineering with Cloud Run" />
   <meta name="component_id" content="110" />
 </walkthrough-metadata>
 
 <walkthrough-disable-features toc></walkthrough-disable-features>
 
-# Platform Engineering Handson 実践編
+# Platform Engineering Handson Cloud Run 編
 
 ## Google Cloud プロジェクトの設定、確認
 
@@ -17,18 +17,6 @@
 ```bash
 export PROJECT_ID=[PROJECT_ID]
 ```
-
-`プロジェクト ID` は [ダッシュボード](https://console.cloud.google.com/home/dashboard) に進み、左上の **プロジェクト情報** から確認します。
-
-### **2. プロジェクトの課金が有効化されていることを確認する**
-
-```bash
-gcloud beta billing projects describe ${PROJECT_ID} | grep billingEnabled
-```
-
-**Cloud Shell の承認** という確認メッセージが出た場合は **承認** をクリックします。
-
-出力結果の `billingEnabled` が **true** になっていることを確認してください。**false** の場合は、こちらのプロジェクトではハンズオンが進められません。別途、課金を有効化したプロジェクトを用意し、本ページの #1 の手順からやり直してください。
 
 ## **環境準備**
 
@@ -74,7 +62,7 @@ Google Cloud では利用したい機能ごとに、有効化を行う必要が�
 〜finished successfully というメッセージが出たら正常に終了しています。
 
 ```bash
-gcloud services enable cloudbuild.googleapis.com container.googleapis.com artifactregistry.googleapis.com clouddeploy.googleapis.com
+gcloud services enable cloudbuild.googleapis.com container.googleapis.com artifactregistry.googleapis.com clouddeploy.googleapis.com workstations.googleapis.com run.googleapis.com
 ```
 
 **GUI**: [API ライブラリ](https://console.cloud.google.com/apis/library?project={{project-id}})
@@ -94,7 +82,7 @@ gcloud config set compute/region asia-northeast1 && gcloud config set compute/zo
 ### **01. チュートリアル資材があるディレクトリに移動する**
 
 ```bash
-cd ~/gcp-getting-started-lab-jp/pfe-cicd
+cd ~/gpfe-handson-run
 ```
 
 ### **02. チュートリアルを開く**
@@ -179,14 +167,11 @@ gcloud workstations clusters create cluster-handson \
 
 以上で事前準備は完了です。
 
-## **Lab-01 Google Cloud での CI/CD**
-Cloud Run 上のワークロードに対して CI/CD を実現するための Cloud Build や Cloud Deploy の機能を試してみます。
-
-## **Lab-02. Cloud Workstations による Golden Path の提供**
+## **Lab-01. Cloud Workstations による Golden Path の提供**
 Platform Engineering の観点から、開発者に作成ずみの開発環境とサンプルとなるアプリケーションのテンプレートを提供します。
 また、Platform 利用者に立場に立って、アプリケーションのデプロイを試してみます。
 
-### **Lab-02-01. Artifact Registry 作成**
+### **Lab-01-01. Artifact Registry 作成**
 Cloud Workstations イメージを保管するためにレポジトリを作成します。
 
 ```bash
@@ -196,23 +181,23 @@ gcloud artifacts repositories create ws-repo \
   --description="Docker repository for Cloud workstations"
 ```
 
-### **Lab-02-02. Cloud Workstations コンテナイメージの作成**
+### **Lab-01-02. Cloud Workstations コンテナイメージの作成**
 
 開発者がサンプルコードを起動するためのライブラリや Code OSS 拡張機能を事前に有効化したイメージを作成します。
 今回はあらかじめ用意したサンプルコードを利用します。中身は以下で確認できます。
 
 ```bash
-cat lab-02/workstations/Dockerfile
+cat lab-01/workstations/Dockerfile
 ```
 Cloud Build を利用して、Cloud Workstations コンテナイメージをビルドします。
 (赤字でメッセージが出ることがありますが、問題ございません。)
 
 ```bash
-gcloud builds submit lab-02/workstations/ \
+gcloud builds submit lab-01/workstations/ \
   --tag asia-northeast1-docker.pkg.dev/${PROJECT_ID}/ws-repo/codeoss-spring:v1.0.0
 ```
 
-### **Lab-02-03. Cloud Workstations イメージ Pull 用のサービスアカウントの設定**
+### **Lab-01-03. Cloud Workstations イメージ Pull 用のサービスアカウントの設定**
 
 プライベートなカスタムイメージを利用するため、Artifact Registry から Pull できる権限を持つサービスアカウントを作成しておきます。
 
@@ -230,7 +215,7 @@ gcloud artifacts repositories add-iam-policy-binding ws-repo \
   --role=roles/artifactregistry.reader
 ```
 
-### **Lab-02-04. Cloud Workstations 構成の作成**
+### **Lab-01-04. Cloud Workstations 構成の作成**
 
 開発者むけにカスタマイズしたコンテナイメージを利用して Cloud Workstations の構成を作成します。
 
@@ -249,7 +234,7 @@ gcloud workstations configs create codeoss-spring \
   --container-custom-image asia-northeast1-docker.pkg.dev/${PROJECT_ID}/ws-repo/codeoss-spring:v1.0.0
 ```
 
-### **Lab-02-05. Workstations の作成**
+### **Lab-01-05. Workstations の作成**
 
 開発者むけに一台、Workstations を作成します。この作業は、通常、開発者ごとに行うことになります。
 
@@ -259,7 +244,7 @@ gcloud workstations create ws-spring-dev \
   --cluster cluster-handson \
   --config codeoss-spring
 ```
-### **Lab-02-06. CI/CD パイプラインの準備**
+### **Lab-01-06. CI/CD パイプラインの準備**
 
 Platform Engineering の要素の一つとして、デプロイの自動化があります。
 プラットフォームの管理者として開発者が簡単にデプロイできるように Cloud Build/Cloud Deploy を使ってパイプラインを構築しておきます。
@@ -267,35 +252,35 @@ Platform Engineering の要素の一つとして、デプロイの自動化が�
 各ファイルの中身を確認しておきます。Cloud Build のファイルについては、実際は開発者が Workstation で使うため、ここでは確認のみです。同じファイルが開発者側のレポジトリにも保存されています。
 
 ```bash
-cat lab-02/cloudbuild.yaml
+cat lab-01/cloudbuild.yaml
 ```
 
 ```bash
-cat lab-02/clouddeploy.yaml
+cat lab-01/clouddeploy.yaml
 ```
 
 このファイルは`PROJECT_ID`がプレースホルダーになっていますので、各自の環境に合わせて置換します。
 
 ```bash
-sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" lab-02/clouddeploy.yaml
+sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" lab-01/clouddeploy.yaml
 ```
 
 正しく反映されているか確認します。
 ```bash
-cat lab-02/clouddeploy.yaml
+cat lab-01/clouddeploy.yaml
 ```
 
 まずは、パイプラインとターゲットを Cloud Deploy に登録します。これによりアプリケーションをデプロイするための
 Cluster および、dev / prod という順序性が定義されます。
 
 ```bash
-gcloud deploy apply --file lab-02/clouddeploy.yaml --region=asia-northeast1 --project=$PROJECT_ID
+gcloud deploy apply --file lab-01/clouddeploy.yaml --region=asia-northeast1 --project=$PROJECT_ID
 ```
 
 デプロイ方法は、`skaffold.yaml`に定義されています。ここには、デプロイに利用するマニフェスト、およびデプロイに対応する成果物が定義されています。
 
 ```bash
-cat lab-02/skaffold.yaml
+cat lab-01/skaffold.yaml
 ```
 
 Artifact Registry に CI で作成する成果物であるコンテナイメージを保管するためのレポジトリを作成しておきます。
@@ -326,10 +311,13 @@ gcloud iam service-accounts add-iam-policy-binding $COMPUTE_SA \
     --project=$PROJECT_ID
 ```
 
+
 以上で、プラットフォーム管理者としての作業は終わりました。
 続いて実際にプラットフォームを利用する開発者としての体験をしてみます。
 
-### **Lab-02-07. Workstations の起動**
+## **Lab-02. Golden Path を利用した開発体験**
+
+### **Lab-02-01. Workstations の起動**
 開発者はまず、自分の Workstations を起動することになります。
 GUI での作業となります。
 ブラウザで新しいタブを開き、[Workstations一覧](https://console.cloud.google.com/workstations/list)を開きます。
@@ -337,18 +325,24 @@ GUI での作業となります。
 起動には数分程度かかります。
 ステータスが、稼働中になりましたら、開始をクリックします。新しいタブで Code OSS の Welcome 画面が開きます。初回は表示に少し時間がかかります。
 
-### **Lab-02-08. サンプルアプリケーションの入手**
+### **Lab-02-02. レポジトリのフォーク**
+サンプルアプリケーションのレポジトリを自身のレポジトリへフォークします。
+ウェブブラウザの URL バーに `https://github.com/ssekimoto/gs-spring-boot` を入力して移動します。
+移動先で画面上部の Fork をクリックします。その後任意の名前のレポジトリにフォークします。
+
+
+### **Lab-02-03. サンプルアプリケーションの入手**
 git よりサンプルアプリケーションを取得します。
 左側の2番目のアイコンをクリック、または、Ctrl + Shift + E の入力で、EXPLORER が開きます。
 Clone Repository を選択します。
 
-上部に開いた URL バーに `https://github.com/ssekimoto/gs-spring-boot.git`と入力します。
-入力後、`レポジトリの URL https://github.com/ssekimoto/gs-spring-boot.git`をクリックします。
+上部に開いた URL バーに `https://github.com/[username]/gs-spring-boot.git`と入力します。
+入力後、`レポジトリの URL https://github.com/[username]/gs-spring-boot.git`をクリックします。
 (Github から複製を選択してしまうと、Github の認証が必要となりますのでキャンセルしてやり直してください)
 複製するフォルダーを選択してください、はそのまま OK をクリックしてください。
 続いて 複製したレポジトリを開きますか？または現在のワークスペースに追加しますか？という選択には、`開く(Open)`を選択してください。
 
-### **Lab-02-09. サンプルアプリケーションの実行**
+### **Lab-02-04. サンプルアプリケーションの実行**
 まずは、手元のローカル（Cloud Workstations 自体の中）でアプリケーションをテスト実行してみます。
 左上の３本の線のアイコンから、Terminal > New Terminal を選択します。
 画面下にターミナルが現れますので、こちらで作業を実施します。
@@ -375,10 +369,10 @@ java -jar target/spring-boot-complete-0.0.1-SNAPSHOT.jar
 続いて、Open をクリックするとシンプルなアプリケーションにアクセスできます。
 完了したら、ターミナルに戻り、Ctrl-C でアプリケーションを停止しておきます。
 
-### **Lab-02-10. GKE でのアプリケーションの実行**
+### **Lab-02-5. Cloud Run でのアプリケーションの実行**
 引き続き Cloud Workstations で作業をします。
 サンプルアプリケーションと一緒に、Dockerfile と先ほどの CI/CD パイプライン用のファイル も Golden Path として git から提供されています。
-ここでは、プラットフォーム管理者が作成したパイプラインを利用して、アプリケーションのコンテナ化から、GKE へのデプロイまでを自動化する体験をします。
+ここでは、プラットフォーム管理者が作成したパイプラインを利用して、アプリケーションのコンテナ化から、Cloud Run へのデプロイまでを自動化する体験をします。
 Workstations 上のターミナルで実行します。もしディレクトリを移動している場合、`complete` へ移動しておきます。
 
 ```bash
@@ -408,20 +402,209 @@ export PROJECT_ID=[PROJECT_ID(自身のIDに置き換えます[]は不要です)
 gcloud config set project ${PROJECT_ID}
 ```
 
-CI/CD パイプラインを利用して、コンテナのビルドおよび GKE の dev-cluster へのデプロイを実施します。
+CI/CD パイプラインを利用して、コンテナのビルドおよび Cloud Run の 開発環境 へのデプロイを実施します。
+
+## **Cloud Buildの設定**
+
+<walkthrough-tutorial-duration duration=10></walkthrough-tutorial-duration>
+
+<walkthrough-enable-apis apis="cloudbuild.googleapis.com"></walkthrough-enable-apis>
+
+Cloud Buildのコンソール画面から設定をしましょう。
+
+<walkthrough-menu-navigation sectionId="CLOUD_BUILD_SECTION"></walkthrough-menu-navigation>
+
+見つからない場合は次のリンクから開くか、画面真ん中上部の検索から遷移をしてください。
+
+<walkthrough-path-nav path="https://console.cloud.google.com/cloud-build" >Cloud Build に移動</walkthrough-path-nav>
+
+### **1. GitHubリポジトリの接続**
+
+<walkthrough-info-message>本手順はGitHubアカウントの状況によって画面が異なるケースがあります。ハンズオン手順と異なる場合、画面の表示内容にあわせて設定ください。</walkthrough-info-message>
+
+今回利用するサンプルアプリケーションは、GitHubリポジトリに格納されています。Cloud Build で GitHubリポジトリを利用するために、GitHubリポジトリとの連携を設定します。
+
+1. <walkthrough-spotlight-pointer cssSelector="a[id='cfctest-section-nav-item-CLOUD_BUILD_REPOSITORIES']" validationPath="/cloud-build/.*">リポジトリ</walkthrough-spotlight-pointer>メニューに遷移します。
+2. <walkthrough-spotlight-pointer locator="semantic({tab '第 2 世代'})" validationPath="/cloud-build/repositories/2nd-gen">第2世代</walkthrough-spotlight-pointer>のタブを選択して、<walkthrough-spotlight-pointer locator="semantic({button 'ホスト接続を作成'})" validationPath="/cloud-build/repositories/2nd-gen">ホスト接続を作成</walkthrough-spotlight-pointer>よりGitHubリポジトリとの接続を行います。
+3. `[新しいホストに接続]`において、プロバイダ`[GitHub]`を選択します。
+   - リージョン：`asia-northeast1`
+   - 名前：`cnsrun-app-handson`
+4. <walkthrough-spotlight-pointer locator="semantic({button '接続'})" validationPath="/cloud-build/connections/create">接続</walkthrough-spotlight-pointer>ボタンを押します。
+
+GitHubのページに遷移をし、Google Cloud Buildに対するPermissionを求められます。
+`[Authorize Google Cloud Build]`を押し、許可をします。
+
+Cloud Buildの画面に戻り、`[既存のGitHubインストールの使用]`モーダルが表示されます。
+`[インストール]`ボタンを押し、**組織ではなく個人のGitHubアカウント**を選択して `[確認]`を押します。
+ホスト接続が作成できたら、次に`[リポジトリをリンク]`を押下します。
+
+先ほど作成したホスト接続を選択し、リポジトリには今回のサンプルアプリケーションを選択して`[リンク]`を押します。
+
+以上でGitHubリポジトリとの接続が完了です。
+
+### **2. サービスアカウントの作成**
+
+まず、Cloud Buildが利用するサービスアカウントを作成しておきます。
 
 ```bash
-gcloud builds submit --config cloudbuild.yaml .
+gcloud iam service-accounts create cnsrun-cloudbuild --display-name "Service Account for Cloud Build in cnsrun"
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+  --member=serviceAccount:cnsrun-cloudbuild@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+  --condition=None \
+  --role=roles/cloudbuild.builds.builder
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+  --member=serviceAccount:cnsrun-cloudbuild@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+  --condition=None \
+  --role=roles/logging.logWriter
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+  --member=serviceAccount:cnsrun-cloudbuild@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+  --condition=None \
+  --role=roles/clouddeploy.releaser
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+  --member=serviceAccount:cnsrun-cloudbuild@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+  --condition=None \
+  --role=roles/iam.serviceAccountUser
 ```
+
+### **3. Cloud Buildの設定**
+
+次に、Cloud Buildの起動対象となる「ソースコードのプッシュ」対象のリポジトリ名を取得します。
+
+```bash
+REPO_NAME=$(gcloud beta builds repositories list --connection=cnsrun-app-handson --region=asia-northeast1 --format=json | jq -r .[].name)
+```
+
+最後に、Cloud Buildのトリガを作成します。
+
+```bash
+gcloud beta builds triggers create github \
+--name=cnsrun-frontend-trigger \
+--region=asia-northeast1 \
+--repository="$REPO_NAME" \
+--branch-pattern=^main$ \
+--build-config=app/frontend/cloudbuild_push.yaml \
+--included-files=app/frontend/** \
+--substitutions=_DEPLOY_ENV=main \
+--service-account=projects/${GOOGLE_CLOUD_PROJECT}/serviceAccounts/cnsrun-cloudbuild@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com
+```
+
+<walkthrough-footnote>第2世代と第1世代でパラメータが微妙に違うので注意が必要です。`--repo-name`や`--repo-owner`は第1世代向けです。https://cloud.google.com/sdk/gcloud/reference/beta/builds/triggers/create/github </walkthrough-footnote>
+
+<walkthrough-spotlight-pointer locator="semantic({link 'トリガー、5/4'})" validationPath="/cloud-build/.*">トリガー</walkthrough-spotlight-pointer>
+に遷移をして、作成されていることを確認し、次に進みましょう。
+
+## **Cloud Deploy の設定**
+
+<walkthrough-tutorial-duration duration=10></walkthrough-tutorial-duration>
+
+<walkthrough-enable-apis apis="clouddeploy.googleapis.com"></walkthrough-enable-apis>
+
+まずはコンソールから Cloud Deploy のページに移動します。
+
+<walkthrough-menu-navigation sectionId="CLOUD_DEPLOY_SECTION"></walkthrough-menu-navigation>
+
+見つからない場合は次のリンクから開くか、画面真ん中上部の検索から遷移をしてください。
+
+<walkthrough-path-nav path="https://console.cloud.google.com/deploy" >Cloud Deploy に移動</walkthrough-path-nav>
+
+### **1. サービスアカウントの作成**
+
+まず、Cloud Deployが利用するサービスアカウントを作成しておきます。
+
+```bash
+gcloud iam service-accounts create cnsrun-clouddeploy --display-name "Service Account for Cloud Deploy in cnsrun"
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+  --member=serviceAccount:cnsrun-clouddeploy@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+  --condition=None \
+  --role=roles/logging.logWriter
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+  --member=serviceAccount:cnsrun-clouddeploy@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+  --condition=None \
+  --role=roles/clouddeploy.jobRunner
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+  --member=serviceAccount:cnsrun-clouddeploy@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+  --condition=None \
+  --role=roles/iam.serviceAccountUser
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+  --member=serviceAccount:cnsrun-clouddeploy@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+  --condition=None \
+  --role=roles/run.developer
+gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
+  --member=serviceAccount:cnsrun-clouddeploy@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com \
+  --condition=None \
+  --role=roles/storage.objectUser
+```
+
+### **2. デリバリーパイプラインの作成**
+
+Cloud Deployではデリバリーパイプラインを作成し、Cloud Runをデプロイ先ターゲットとする設定を作成します。
+
+```bash
+APP_TYPE=frontend
+sed -e "s/PROJECT_ID/${GOOGLE_CLOUD_PROJECT}/g" doc/clouddeploy.yml | sed -e "s/REGION/asia-northeast1/g" | sed -e "s/SERVICE_NAME/cnsrun-${APP_TYPE}/g" > /tmp/clouddeploy_${APP_TYPE}.yml
+gcloud deploy apply --file=/tmp/clouddeploy_${APP_TYPE}.yml --region asia-northeast1
+```
+<walkthrough-spotlight-pointer cssSelector="[id=cfctest-section-nav-item-delivery_pipelines]">デリバリーパイプライン</walkthrough-spotlight-pointer>、<walkthrough-spotlight-pointer cssSelector="[id=cfctest-section-nav-item-targets]">デプロイ先ターゲット</walkthrough-spotlight-pointer>の設定が完了したことをコンソールから確認して次に進みましょう。
+
+## **フロントエンドアプリケーションを修正**
+
+<walkthrough-tutorial-duration duration=10></walkthrough-tutorial-duration>
+
+CI/CDがうまく機能をして、アプリケーションへの修正がデプロイされることを確認しましょう。
+Cloud Buildに接続したGitHubのリポジトリを開き、`app/frontend/main.go`を開いて`http.HandleFunc("/frontend")`の応答を適当な文字列に変更してみましょう。
+
+```go
+-   fmt.Fprintf(w, "Hello cnsrun handson's user:D\n")
++   fmt.Fprintf(w, "Hello first hands-on\n")
+```
+
+Cloud RunのYAML設定ファイルの設定も少し変更をします。
+次のコマンドを実行してください。
+
+```bash
+echo ${GOOGLE_CLOUD_PROJECT}
+```
+
+編集ファイルがローカル環境にあり、macOSの場合は次のコマンドで更新もできます。
+コマンド実行が難しい場合は、下記のファイルの`PROJECT_ID`を手動で自身のプロジェクトIDに置き換えてください。
+
+- `app/frontend/cloudrun.yaml`
+- `app/backend/cloudrun.yaml`
+- `app/batch/cloudrun.yaml`
+
+```bash
+YOUR_PROJECT_ID=`自身のプロジェクトID`
+sed -i -e "s/PROJECT_ID/${YOUR_PROJECT_ID}/g" app/frontend/cloudrun.yaml
+sed -i -e "s/PROJECT_ID/${YOUR_PROJECT_ID}/g" app/backend/cloudrun.yaml
+sed -i -e "s/PROJECT_ID/${YOUR_PROJECT_ID}/g" app/batch/cloudrun.yaml
+```
+
+変更を加えたら、リモートブランチへプッシュをして、Cloud Buildの`[履歴メニュー]`から処理が起動したことを確認します。
+
+```bash
+git add app
+git commit -m "feat: hands-on step2"
+git push origin main
+```
+
+ビルド完了まで、おおよそ5分ほどかかります。
+ビルドが正常終了したら、再度リクエストを発行して修正が反映されたことを確認しましょう。
+
+```bash
+FRONTEND_URL=$(gcloud run services describe cnsrun-frontend --region=asia-northeast1 --format='value(status.url)')
+curl -i $FRONTEND_URL/frontend
+```
+
+
 
 ### **Lab-02-11. Cloud Deploy での実行確認と本番環境へのプロモート**
 
 デプロイ中の様子を見るため、GUI で確認していきます。
 数分の経過後、[Cloud Deploy コンソール](https://console.cloud.google.com/deploy)に最初のリリースの詳細が表示され、それが最初のクラスタに正常にデプロイされたことが確認できます。
 
-[Kubernetes Engine コンソール](https://console.cloud.google.com/kubernetes)に移動して、アプリケーションのエンドポイントを探します。
-左側のメニューバーより Gateway、Service、Ingress を選択し`サービス`タブに遷移します。表示される一覧から `spring-app-service` という名前のサービスを見つけます。
-Endpoints 列に IP アドレスが表示され、リンクとなっているため、それをクリックして移動します。
+[Cloud Run コンソール](https://console.cloud.google.com/run)に移動して、アプリケーションのエンドポイントを探します。
+`サービス`で表示される一覧から `spring-app-service` という名前のサービスを見つけ、クリックします。
+画面上部から、`https://php-app-696526553493.asia-northeast1.run.app`
 アプリケーションが期待どおりに動作していることを確認します。
 
 ステージングでテストしたので、本番環境に昇格する準備が整いました。
