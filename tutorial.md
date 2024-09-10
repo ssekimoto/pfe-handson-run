@@ -404,31 +404,22 @@ gcloud config set project ${PROJECT_ID}
 
 CI/CD パイプラインを利用して、コンテナのビルドおよび Cloud Run の 開発環境 へのデプロイを実施します。
 
-## **Cloud Buildの設定**
+### **Lab-02-6. Cloud Build ビルドトリガーの設定**
 
-<walkthrough-tutorial-duration duration=10></walkthrough-tutorial-duration>
-
-<walkthrough-enable-apis apis="cloudbuild.googleapis.com"></walkthrough-enable-apis>
-
-Cloud Buildのコンソール画面から設定をしましょう。
+Cloud Build のコンソール画面からビルドトリガーを設定します。
 
 <walkthrough-menu-navigation sectionId="CLOUD_BUILD_SECTION"></walkthrough-menu-navigation>
 
-見つからない場合は次のリンクから開くか、画面真ん中上部の検索から遷移をしてください。
-
 <walkthrough-path-nav path="https://console.cloud.google.com/cloud-build" >Cloud Build に移動</walkthrough-path-nav>
 
-### **1. GitHubリポジトリの接続**
+Cloud Build で GitHub リポジトリを利用するために、GitHub リポジトリとの連携を設定します。
 
-<walkthrough-info-message>本手順はGitHubアカウントの状況によって画面が異なるケースがあります。ハンズオン手順と異なる場合、画面の表示内容にあわせて設定ください。</walkthrough-info-message>
+左のサイドバーよりリポジトリ</walkthrough-spotlight-pointer>メニューに遷移します。
 
-今回利用するサンプルアプリケーションは、GitHubリポジトリに格納されています。Cloud Build で GitHubリポジトリを利用するために、GitHubリポジトリとの連携を設定します。
-
-1. <walkthrough-spotlight-pointer cssSelector="a[id='cfctest-section-nav-item-CLOUD_BUILD_REPOSITORIES']" validationPath="/cloud-build/.*">リポジトリ</walkthrough-spotlight-pointer>メニューに遷移します。
-2. <walkthrough-spotlight-pointer locator="semantic({tab '第 2 世代'})" validationPath="/cloud-build/repositories/2nd-gen">第2世代</walkthrough-spotlight-pointer>のタブを選択して、<walkthrough-spotlight-pointer locator="semantic({button 'ホスト接続を作成'})" validationPath="/cloud-build/repositories/2nd-gen">ホスト接続を作成</walkthrough-spotlight-pointer>よりGitHubリポジトリとの接続を行います。
-3. `[新しいホストに接続]`において、プロバイダ`[GitHub]`を選択します。
+<walkthrough-spotlight-pointer locator="semantic({tab '第 2 世代'})" validationPath="/cloud-build/repositories/2nd-gen">第2世代</walkthrough-spotlight-pointer>のタブを選択して、<walkthrough-spotlight-pointer locator="semantic({button 'ホスト接続を作成'})" validationPath="/cloud-build/repositories/2nd-gen">ホスト接続を作成</walkthrough-spotlight-pointer>より GitHub リポジトリとの接続を行います。
+ `[新しいホストに接続]`にて、プロバイダ`[GitHub]`を選択します。
    - リージョン：`asia-northeast1`
-   - 名前：`cnsrun-app-handson`
+   - 名前：`cloudrun-handson`
 4. <walkthrough-spotlight-pointer locator="semantic({button '接続'})" validationPath="/cloud-build/connections/create">接続</walkthrough-spotlight-pointer>ボタンを押します。
 
 GitHubのページに遷移をし、Google Cloud Buildに対するPermissionを求められます。
@@ -438,9 +429,9 @@ Cloud Buildの画面に戻り、`[既存のGitHubインストールの使用]`�
 `[インストール]`ボタンを押し、**組織ではなく個人のGitHubアカウント**を選択して `[確認]`を押します。
 ホスト接続が作成できたら、次に`[リポジトリをリンク]`を押下します。
 
-先ほど作成したホスト接続を選択し、リポジトリには今回のサンプルアプリケーションを選択して`[リンク]`を押します。
+先ほど作成したホスト接続を選択し、リポジトリには `pfe-handson-run` を選択して`[リンク]`を押します。
 
-以上でGitHubリポジトリとの接続が完了です。
+以上でGitHubリポジトリとの接続が完了しました。
 
 ### **2. サービスアカウントの作成**
 
