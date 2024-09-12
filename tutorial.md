@@ -196,7 +196,7 @@ Cloud Build を利用して、Cloud Workstations コンテナイメージをビ�
 
 ```bash
 gcloud builds submit lab-01/workstations/ \
-  --tag asia-northeast1-docker.pkg.dev/${PROJECT_ID}/ws-repo/codeoss-spring:v1.0.0
+  --tag asia-northeast1-docker.pkg.dev/${PROJECT_ID}/ws-repo/codeoss-node:v1
 ```
 
 ### **Lab-01-03. Cloud Workstations イメージ Pull 用のサービスアカウントの設定**
@@ -222,7 +222,7 @@ gcloud artifacts repositories add-iam-policy-binding ws-repo \
 開発者むけにカスタマイズしたコンテナイメージを利用して Cloud Workstations の構成を作成します。
 
 ```bash
-gcloud workstations configs create codeoss-spring \
+gcloud workstations configs create codeoss-node \
   --machine-type e2-standard-4 \
   --pd-disk-size 200 \
   --pd-disk-type pd-standard \
@@ -233,7 +233,7 @@ gcloud workstations configs create codeoss-spring \
   --shielded-secure-boot \
   --shielded-vtpm \
   --service-account codeoss-customized-sa@${PROJECT_ID}.iam.gserviceaccount.com \
-  --container-custom-image asia-northeast1-docker.pkg.dev/${PROJECT_ID}/ws-repo/codeoss-spring:v1.0.0
+  --container-custom-image asia-northeast1-docker.pkg.dev/${PROJECT_ID}/ws-repo/codeoss-node:v1
 ```
 
 ### **Lab-01-05. Workstations の作成**
@@ -241,10 +241,10 @@ gcloud workstations configs create codeoss-spring \
 開発者むけに一台、Workstations を作成します。この作業は、通常、開発者ごとに行うことになります。
 
 ```bash
-gcloud workstations create ws-spring-dev \
+gcloud workstations create ws-node-dev \
   --region asia-northeast1 \
   --cluster cluster-handson \
-  --config codeoss-spring
+  --config codeoss-node
 ```
 ### **Lab-01-06. CI/CD パイプラインの準備**
 
