@@ -6,7 +6,7 @@ steps:
     - |
       curl -Lo /usr/local/bin/skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && \
       chmod +x /usr/local/bin/skaffold && \
-      skaffold build --file-output artifacts.json
+      skaffold build -f lab-02/pets-api/skaffold.yaml --file-output artifacts.json
 
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'gcloud'
@@ -22,8 +22,8 @@ steps:
     - '--build-artifacts'
     - 'artifacts.json'
     - '--skaffold-file'
-    - 'skaffold.yaml'
+    - 'lab-02/pets-api/skaffold.yaml'
     - '--source'
-    - '.'
+    - 'lab-02/pets-api/'
 options:
   logging: CLOUD_LOGGING_ONLY
