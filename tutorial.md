@@ -351,7 +351,7 @@ URL の最後に `/random-pets` とパスを付与すると API にアクセス�
 
 先ほどは、手動でビルドトリガーを設定しましたが、
 サンプルアプリケーションのレポジトリを自身のレポジトリへフォークします。
-ウェブブラウザの URL バーに `https://github.com/ssekimoto/gs-spring-boot` を入力して移動します。
+ウェブブラウザの URL バーに `https://github.com/ssekimoto/pfe-handson-run.git` を入力して移動します。
 移動先で画面上部の Fork をクリックします。その後任意の名前のレポジトリにフォークします。
 
 
@@ -376,9 +376,9 @@ git よりサンプルアプリケーションを取得します。
 左側の2番目のアイコンをクリック、または、Ctrl + Shift + E の入力で、EXPLORER が開きます。
 Clone Repository を選択します。
 
-上部に開いた URL バーに `https://github.com/[username]/gs-spring-boot.git`と入力します。
-入力後、`レポジトリの URL https://github.com/[username]/gs-spring-boot.git`をクリックします。
-(Github から複製を選択してしまうと、Github の認証が必要となりますのでキャンセルしてやり直してください)
+上部に開いた URL バーに `https://github.com/[ユーザー名]/pfe-handson-run.git`と入力します。
+入力後、`Github から複製を複製`をクリックします。
+そのまま自身の Github への認証を実施します。
 複製するフォルダーを選択してください、はそのまま OK をクリックしてください。
 続いて 複製したレポジトリを開きますか？または現在のワークスペースに追加しますか？という選択には、`開く(Open)`を選択してください。
 
@@ -387,62 +387,38 @@ Clone Repository を選択します。
 左上の３本の線のアイコンから、Terminal > New Terminal を選択します。
 画面下にターミナルが現れますので、こちらで作業を実施します。
 
-complete ディレクトリに移動します。
+アプリケーションのあるディレクトリに移動します。
 
 ```bash
-cd complete
+cd lab02/pets-api
 ```
 
 アプリケーションをビルドします。
 
 ```bash
-mvn clean install -DskipTests
+npm install
+npm run build
 ```
 
 ビルドしたアプリケーションをまずは Workstations 上で実行します。
 
 ```bash
-java -jar target/spring-boot-complete-0.0.1-SNAPSHOT.jar
+npm start
 ```
 
 実行すると 右下に Open Preview という吹き出しが現れるので、クリックします。
-続いて、Open をクリックするとシンプルなアプリケーションにアクセスできます。
+続いて、Open をクリックするとアプリケーションにアクセスできます。
 完了したら、ターミナルに戻り、Ctrl-C でアプリケーションを停止しておきます。
 
-### **Lab-02-5. Cloud Run でのアプリケーションの実行**
-引き続き Cloud Workstations で作業をします。
-サンプルアプリケーションと一緒に、Dockerfile と先ほどの CI/CD パイプライン用のファイル も Golden Path として git から提供されています。
-ここでは、プラットフォーム管理者が作成したパイプラインを利用して、アプリケーションのコンテナ化から、Cloud Run へのデプロイまでを自動化する体験をします。
-Workstations 上のターミナルで実行します。もしディレクトリを移動している場合、`complete` へ移動しておきます。
-
-```bash
-cd /home/user/gs-spring-boot/complete
+### **Lab-02-5. アプリケーションの更新**
+ここでは実際にアプリケーションを変更し、変更をコミットします。
+下記のファイルの一部を修正します。
+```
+pfe-handson/lab-02/pets-api/src/app.ts
 ```
 
-Workstations 上では Google Cloud にログインに別途ログインする必要があります。
+左側のアイコンの Source Control よりメッセージを "1st commit"として
 
-```bash
-gcloud auth login
-```
-
-表示される URL を Ctrl + クリックで Open、もしくはコピー&ペーストで別のタブで開きます。
-すると Google アカウントへのログイン画面になるため、ログインを実施します。
-ログインするアカウントは lab 向けに払い出されている student- から始まるものであることに注意してください。
-最後に表示される `4/0` から始まる verification code をコピーして、Cloud Workstations の ターミナルに貼り付けます。
-正常にログインが完了すると
-`You are now logged in as [アカウント]`と表示されます。
-
-また、Cloud Shell と同じように以下設定を行います。
-
-```bash
-export PROJECT_ID=[PROJECT_ID(自身のIDに置き換えます[]は不要です)]
-```
-
-```bash
-gcloud config set project ${PROJECT_ID}
-```
-
-CI/CD パイプラインを利用して、コンテナのビルドおよび Cloud Run の 開発環境 へのデプロイを実施します。
 
 ### **Lab-02-6. Cloud Build ビルドトリガーの設定**
 
