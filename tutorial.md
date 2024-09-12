@@ -453,6 +453,20 @@ npm start
 pfe-handson/lab-02/pets-api/src/app.ts
 ```
 
+また各ファイルのプレースホルダーを変更します。プロジェクト ID は各環境に合わせて入力します。
+
+```bash
+export $PROJECT_ID=qwiklabs-gcp-xx-xxxxxx
+```
+```bash
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)')
+sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" cloudbuild.yaml
+sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" clouddeploy.yaml
+sed -i "s|\${PROJECT_NUMBER}|$PROJECT_NUMBER|g" clouddeploy.yaml
+sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" skaffold.yaml
+sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" manifest.yaml
+```
+
 左側のアイコンの Source Control よりメッセージを `"1st commit"`と入力して `コミット`をクリックします。
 その後 `変更を同期`を再度クリックすると github へ変更がコミットされます。
 
@@ -460,4 +474,3 @@ pfe-handson/lab-02/pets-api/src/app.ts
 [Cloud Deploy](https://console.cloud.google.com/deploy/delivery-pipelines)
 に移動してデプロイがロールアウトされるのを確認します。
 数分後デプロイされ、アプリケーションが更新されるを確認して Lab-02 は完了となります。
-
