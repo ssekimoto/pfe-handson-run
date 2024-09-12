@@ -12,10 +12,10 @@
 
 ### **1. 対象の Google Cloud プロジェクトを設定**
 
-ハンズオンを行う Google Cloud プロジェクトのプロジェクト ID を環境変数に設定し、以降の手順で利用できるようにします。 **(右辺の [PROJECT_ID] を手動で置き換えてコマンドを実行します)**
+ハンズオンを行う Google Cloud プロジェクトのプロジェクト ID を環境変数に設定し、以降の手順で利用できるようにします。
 
 ```bash
-export PROJECT_ID=[PROJECT_ID]
+export PROJECT_ID=$(gcloud config get-value project)
 ```
 
 ## **環境準備**
@@ -82,7 +82,7 @@ gcloud config set compute/region asia-northeast1 && gcloud config set compute/zo
 ### **01. チュートリアル資材があるディレクトリに移動する**
 
 ```bash
-cd ~/gpfe-handson-run
+cd ~/pfe-handson-run
 ```
 
 ### **02. チュートリアルを開く**
@@ -93,8 +93,10 @@ teachme tutorial.md
 
 ### **03. プロジェクト ID を設定する**
 
+ハンズオンを行う Google Cloud プロジェクトのプロジェクト ID を環境変数に設定し、以降の手順で利用できるようにします。
+
 ```bash
-export PROJECT_ID=[PROJECT_ID]
+export PROJECT_ID=$(gcloud config get-value project)
 ```
 
 ### **4. gcloud のデフォルト設定**
