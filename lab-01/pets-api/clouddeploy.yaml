@@ -16,7 +16,6 @@ metadata:
 description: Dev Environment
 run:
   location: asia-northeast1
-  service: dev-my-pets-service
 ---
 apiVersion: deploy.cloud.google.com/v1beta1
 kind: Target
@@ -25,7 +24,6 @@ metadata:
 description: Production Environment
 run:
   location: asia-northeast1
-  service: prod-my-pets-service
 ---
 apiVersion: deploy.cloud.google.com/v1
 kind: Automation
@@ -33,7 +31,7 @@ metadata:
   name: pfe-cicd/promote
 description: promotes a release
 suspended: false
-serviceAccount: ${PROJECT_NUMBER}-compute@developer.gserviceaccount.com
+serviceAccount: ${PROJECT_NUMBER}-compute@developer.gserviceaccount.comv
 selector:
   targets:
   - id: dev
@@ -42,3 +40,4 @@ rules:
     name: "promote-release"
     wait: 1m
     toTargetId: "@next"
+

@@ -253,12 +253,17 @@ Platform Engineering の要素の一つとして、デプロイの自動化が�
 今回はハンズオンのために準備したファイルを活用してパイプラインを準備します。
 各ファイルの中身を確認しておきます。
 
+カレントディレクトを移動して確認します。
 ```bash
-cat lab-01/pets-api/cloudbuild.yaml
+cd $HOME/pfe-handson-run/lab-01/pets-api
 ```
 
 ```bash
-cat lab-01/pets-api/clouddeploy.yaml
+cat cloudbuild.yaml
+```
+
+```bash
+cat clouddeploy.yaml
 ```
 
 このファイルは`{PROJECT_NUMBER}`がプレースホルダーになっていますので、各自の環境に合わせて置換します。
@@ -270,7 +275,7 @@ sed -i "s|\${PROJECT_NUMBER}|$PROJECT_NUMBER|g" clouddeploy.yaml
 
 正しく反映されているか確認します。
 ```bash
-cat lab-01/clouddeploy.yaml
+cat clouddeploy.yaml
 ```
 
 まずは、パイプラインとターゲットを Cloud Deploy に登録します。これによりアプリケーションをデプロイするための
