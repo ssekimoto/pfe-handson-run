@@ -9,8 +9,8 @@ RUN wget https://open-vsx.org/api/esbenp/prettier-vscode/10.1.0/file/esbenp.pret
   && mv extension /opt/code-oss/extensions/prettier
 
 # Download and install Jest extension
-RUN wget https://open-vsx.org/api/orta/vscode-jest/5.1.0/file/orta.vscode-jest-5.1.0.vsix \
-  && unzip orta.vscode-jest-5.1.0.vsix "extension/*" \
+RUN wget https://open-vsx.org/api/orta/vscode-jest/6.2.5/file/orta.vscode-jest-6.2.5.vsix \
+  && unzip orta.vscode-jest-6.2.5.vsix "extension/*" \
   && mv extension /opt/code-oss/extensions/jest
 
 # Download and install ESLint extension
