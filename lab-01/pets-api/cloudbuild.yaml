@@ -1,0 +1,39 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && \
+      chmod +x skaffold && \
+      mv skaffold /usr/local/bin/
+
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'skaffold'
+  args:
+    - 'build'
+    - '--file-output'
+    - 'artifacts.json'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'gcloud'
+  args:
+    - 'deploy'
+    - 'releases'
+    - 'create'
+    - 'release-$(date +%Y%m%d%H%M%S)'
+    - '--region'
+    - 'us-west1'
+    - '--delivery-pipeline'
+    - 'hello-app'
+    - '--gcs-source-staging-dir'
+    - 'gs://hello-app-pipeline/hello-app/source'
+    - '--build-artifacts'
+    - 'artifacts.json'
+    - '--skaffold-file'
+    - 'skaffold.yaml'
+    - '--source'
+    - '.'
+
+images:
+  - 'gcr.io/$PROJECT_ID/hello-app:$(cat artifacts.json | jq -r '.[0].tag')'

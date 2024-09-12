@@ -1,0 +1,23 @@
+apiVersion: skaffold/v3
+kind: Config
+metadata:
+  name: random-pets
+build:
+  tagPolicy:
+    envTemplate:
+      template: "{{ .APP_VERSION }}"
+  artifacts:
+    - image: random-pets
+      context: .
+      docker:
+        buildArgs:
+          app_version: "{{ .APP_VERSION }}"
+        dockerfile: Dockerfile
+  local:
+    useBuildkit: true
+    push: true
+deploy:
+  cloudrun: {}
+manifests:
+  rawYaml:
+    - manifest.yaml

@@ -251,20 +251,21 @@ gcloud workstations create ws-node-dev \
 Platform Engineering の要素の一つとして、デプロイの自動化があります。
 プラットフォームの管理者として開発者が簡単にデプロイできるように Cloud Build/Cloud Deploy を使ってパイプラインを構築しておきます。
 今回はハンズオンのために準備したファイルを活用してパイプラインを準備します。
-各ファイルの中身を確認しておきます。Cloud Build のファイルについては、実際は開発者が Workstation で使うため、ここでは確認のみです。同じファイルが開発者側のレポジトリにも保存されています。
+各ファイルの中身を確認しておきます。
 
 ```bash
-cat lab-01/cloudbuild.yaml
+cat lab-01/pets-api/cloudbuild.yaml
 ```
 
 ```bash
-cat lab-01/clouddeploy.yaml
+cat lab-01/pets-api/clouddeploy.yaml
 ```
 
-このファイルは`PROJECT_ID`がプレースホルダーになっていますので、各自の環境に合わせて置換します。
+このファイルは`{PROJECT_NUMBER}`がプレースホルダーになっていますので、各自の環境に合わせて置換します。
 
 ```bash
-sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" lab-01/clouddeploy.yaml
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)')
+sed -i "s|\${PROJECT_NUMBER}|$PROJECT_NUMBER|g" clouddeploy.yaml
 ```
 
 正しく反映されているか確認します。
@@ -273,16 +274,16 @@ cat lab-01/clouddeploy.yaml
 ```
 
 まずは、パイプラインとターゲットを Cloud Deploy に登録します。これによりアプリケーションをデプロイするための
-Cluster および、dev / prod という順序性が定義されます。
+Cloud Run サービスおよび、dev / prod という順序性が定義されます。
 
 ```bash
-gcloud deploy apply --file lab-01/clouddeploy.yaml --region=asia-northeast1 --project=$PROJECT_ID
+gcloud deploy apply --file clouddeploy.yaml --region=asia-northeast1 --project=$PROJECT_ID
 ```
 
 デプロイ方法は、`skaffold.yaml`に定義されています。ここには、デプロイに利用するマニフェスト、およびデプロイに対応する成果物が定義されています。
 
 ```bash
-cat lab-01/skaffold.yaml
+cat skaffold.yaml
 ```
 
 Artifact Registry に CI で作成する成果物であるコンテナイメージを保管するためのレポジトリを作成しておきます。
