@@ -23,7 +23,7 @@ metadata:
   name: prod
 description: Production Environment
 run:
-  location: projects/${PROJECT_ID}/locations/asia-northeast1
+  location: projects/${PROJECT_ID}/locations/asia-northeast2
 ---
 apiVersion: deploy.cloud.google.com/v1
 kind: Automation

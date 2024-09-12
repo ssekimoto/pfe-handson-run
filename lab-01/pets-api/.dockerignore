@@ -1,2 +1,5 @@
 node_modules
 dist/
+cloudbuild.yaml
+clouddeploy.yaml
+skaffold.yaml

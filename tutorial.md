@@ -269,6 +269,7 @@ cat clouddeploy.yaml
 このファイルは`{PROJECT_NUMBER}`がプレースホルダーになっていますので、各自の環境に合わせて置換します。
 
 ```bash
+sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" clouddeploy.yaml
 PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)')
 sed -i "s|\${PROJECT_NUMBER}|$PROJECT_NUMBER|g" clouddeploy.yaml
 ```
@@ -285,10 +286,19 @@ Cloud Run サービスおよび、dev / prod という順序性が定義され�
 gcloud deploy apply --file clouddeploy.yaml --region=asia-northeast1 --project=$PROJECT_ID
 ```
 
-デプロイ方法は、`skaffold.yaml`に定義されています。ここには、デプロイに利用するマニフェスト、およびデプロイに対応する成果物が定義されています。
+ビルド、デプロイ方法は、`skaffold.yaml`および `manifest.yaml` に定義されています。ここには、デプロイに利用するマニフェスト、およびデプロイに対応する成果物が定義されています。
 
 ```bash
 cat skaffold.yaml
+cat manifest.yaml
+```
+このファイルも`{PROJECT_NUMBER}`がプレースホルダーになっていますので、各自の環境に合わせてそれぞれ置換します。
+
+```bash
+sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" skaffold.yaml
+```
+```bash
+sed -i "s|\${PROJECT_ID}|$PROJECT_ID|g" manifest.yaml
 ```
 
 Artifact Registry に CI で作成する成果物であるコンテナイメージを保管するためのレポジトリを作成しておきます。
@@ -319,6 +329,31 @@ gcloud iam service-accounts add-iam-policy-binding $COMPUTE_SA \
     --project=$PROJECT_ID
 ```
 
+CI/CD パイプラインのテストとして手動で初回ビルドを試してみます。
+
+```bash
+gcloud builds submit --config cloudbuild.yaml .
+```
+
+順番にコンテナのビルドと、Cloud Run へのデプロイが実施されます。
+便宜上、asia-northeast1 を dev 、asia-northeast1を prod として見立てています。
+今回の qwiklabs ではプロジェクトを複数持つことが許可されていないため、このような仕様としています。
+実際にはそれぞれ異なるプロジェクト（本番、開発）をパイプラインの中に含めることが可能です。
+
+[Cloud Run](https://console.cloud.google.com/run)へブラウザからアクセスします。
+random-pets と言う名前のアプリケーションがデプロイされています。
+ですがこのままですと、認証情報をヘッダーに付与した場合しかアクセスできないような仕様となっており、ブラウザからのアクセスができません。
+そのため、`random-pets` > セキュリティ タブより認証の設定を `未認証の呼び出しを許可` にチェックします
+すると上部の URL がクリックできるようになります。
+URL の最後に `/random-pets` とパスを付与すると API にアクセス可能となり json のレスポンスが帰ってきます。
+
+### **Lab-01-06. Build トリガーの設定**
+
+先ほどは、手動でビルドトリガーを設定しましたが、
+サンプルアプリケーションのレポジトリを自身のレポジトリへフォークします。
+ウェブブラウザの URL バーに `https://github.com/ssekimoto/gs-spring-boot` を入力して移動します。
+移動先で画面上部の Fork をクリックします。その後任意の名前のレポジトリにフォークします。
+
 
 以上で、プラットフォーム管理者としての作業は終わりました。
 続いて実際にプラットフォームを利用する開発者としての体験をしてみます。
@@ -334,9 +369,6 @@ GUI での作業となります。
 ステータスが、稼働中になりましたら、開始をクリックします。新しいタブで Code OSS の Welcome 画面が開きます。初回は表示に少し時間がかかります。
 
 ### **Lab-02-02. レポジトリのフォーク**
-サンプルアプリケーションのレポジトリを自身のレポジトリへフォークします。
-ウェブブラウザの URL バーに `https://github.com/ssekimoto/gs-spring-boot` を入力して移動します。
-移動先で画面上部の Fork をクリックします。その後任意の名前のレポジトリにフォークします。
 
 
 ### **Lab-02-03. サンプルアプリケーションの入手**
