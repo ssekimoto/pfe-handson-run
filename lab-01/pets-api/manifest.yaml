@@ -4,6 +4,7 @@ metadata:
   name: random-pets
   annotations:
     run.googleapis.com/ingress: all
+    run.googleapis.com/authentication: none
 spec:
   template:
     spec:
