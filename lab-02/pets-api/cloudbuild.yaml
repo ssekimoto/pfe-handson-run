@@ -24,6 +24,6 @@ steps:
     - '--skaffold-file'
     - 'lab-02/pets-api/skaffold.yaml'
     - '--source'
-    - 'lab-02/pets-api/'
+    - '.'
 options:
   logging: CLOUD_LOGGING_ONLY
