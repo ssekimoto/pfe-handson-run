@@ -4,8 +4,9 @@ metadata:
   name: random-pets
 build:
   tagPolicy:
-    envTemplate:
-      template: "{{ .APP_VERSION }}"
+    dateTime:
+      format: "2006-01-02_15-04-05.999_MST"
+      timezone: "Local"
   artifacts:
     - image: asia-northeast1-docker.pkg.dev/${PROJECT_ID}/app-repo/random-pets
       context: .
@@ -20,4 +21,4 @@ deploy:
   cloudrun: {}
 manifests:
   rawYaml:
-    - lab-02/pets-api/manifest.yaml
+    - manifest.yaml
