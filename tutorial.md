@@ -426,7 +426,7 @@ Clone Repository を選択します。
 アプリケーションのあるディレクトリに移動します。
 
 ```bash
-cd lab02/pets-api
+cd lab-02/pets-api
 ```
 
 アプリケーションをビルドします。
