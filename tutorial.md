@@ -336,7 +336,7 @@ gcloud builds submit --config cloudbuild.yaml .
 ```
 
 順番にコンテナのビルドと、Cloud Run へのデプロイが実施されます。
-便宜上、asia-northeast1 を dev 、asia-northeast1を prod として見立てています。
+便宜上、asia-northeast1 を dev 、us-central1を prod として見立てています。
 今回の qwiklabs ではプロジェクトを複数持つことが許可されていないため、このような仕様としています。
 実際にはそれぞれ異なるプロジェクト（本番、開発）をパイプラインの中に含めることが可能です。
 
