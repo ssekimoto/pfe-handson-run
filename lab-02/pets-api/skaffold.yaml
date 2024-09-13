@@ -12,7 +12,7 @@ build:
       docker:
         buildArgs:
           app_version: "{{ .APP_VERSION }}"
-        dockerfile: Dockerfile
+        dockerfile: lab-02/pets-api/Dockerfile
   local:
     useBuildkit: true
     push: true
@@ -20,4 +20,4 @@ deploy:
   cloudrun: {}
 manifests:
   rawYaml:
-    - manifest.yaml
+    - lab-02/pets-api/manifest.yaml
