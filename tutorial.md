@@ -444,6 +444,7 @@ npm start
 
 実行すると 右下に Open Preview という吹き出しが現れるので、クリックします。
 続いて、Open をクリックするとアプリケーションにアクセスできます。
+URL の最後に `/random-pets` とパスを付与すると API にアクセス可能となり json のレスポンスが帰ってきます。
 完了したら、ターミナルに戻り、Ctrl-C でアプリケーションを停止しておきます。
 
 ### **Lab-02-4. アプリケーションの更新**
@@ -452,11 +453,13 @@ npm start
 ```
 pfe-handson/lab-02/pets-api/src/app.ts
 ```
-
+参考までに sample.txt というファイルをおいているので、
+更新する際にこちらへ内容を置き換えていただいても問題ございません。
 また各ファイルのプレースホルダーを変更します。プロジェクト ID は各環境に合わせて入力します。
 
-```bash
+```
 export $PROJECT_ID=qwiklabs-gcp-xx-xxxxxx
+export $PROJECT_NUMBER=xxxxxxxxxxxx
 ```
 ```bash
 PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format='value(projectNumber)')
